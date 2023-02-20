@@ -17,7 +17,7 @@ https://github.com/gitpod-io/gitpod/issues/1315
 
 ### Recreate Cruddur Logical Diagram
 
-![Cruddur Logical Design](assets/Creddur Logical Diagram.jpeg)
+![Cruddur Logical Design](assets/CreddurLogicalDiagram.jpeg)
 
 [Lucid Charts Share Link](https://lucid.app/lucidchart/3697c32e-4a49-4518-8066-b12d57d6c5dd/edit?viewport_loc=-1384%2C-685%2C3150%2C1395%2C0_0&invitationId=inv_c7d489ab-9b15-4657-b969-21bb2cbb4dbf) 
 
