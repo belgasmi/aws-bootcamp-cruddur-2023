@@ -90,6 +90,102 @@ gitpod /workspace $ aws sts get-caller-identity
 ![Proof of Working AWS CLI](assets/proof-of-aws-cli.png)
 
 
+### Enable Billing 
+
+Enable the Billing Alerts to automatically monitor my AWS Service costs.
+
+- In Root Account go to the [Billing Page](https://console.aws.amazon.com/billing/)
+- Under `Billing Preferences` Choose `Receive Billing Alerts`
+- Save Preferences
+
+### Create a Billing Alarm
+
+#### Create SNS Topic
+
+- We need an SNS topic before we create an alarm.
+- The SNS topic is what will delivery us an alert when we get overbilled
+- [aws sns create-topic](https://docs.aws.amazon.com/cli/latest/reference/sns/create-topic.html)
+
+We'll create an SNS Topic
+```sh
+aws sns create-topic --name billing-alarm
+```
+which will return a TopicARN
+```json
+{
+    "TopicArn": "arn:aws:sns:us-east-1:794659242415:billing-alarm"
+}
+```
+
+We'll create a subscription supply the TopicARN and our Email
+```sh
+aws sns subscribe \
+    --topic-arn arn:aws:sns:us-east-1:794659242415:billing-alarm \
+    --protocol email \
+    --notification-endpoint mohamed.nejib.belgasmi@gmail.com
+```
+Output : 
+```json
+{
+    "SubscriptionArn": "pending confirmation"
+}
+```
+
+Check the email and confirm the subscription
+```sh
+You have chosen to subscribe to the topic:
+arn:aws:sns:us-east-1:794659242415:billing-alarm
+
+To confirm this subscription, click or visit the link below (If this was in error no action is necessary):
+Confirm subscription
+
+Please do not reply directly to this email. If you wish to remove yourself from receiving all future SNS subscription confirmation requests please send an email to sns-opt-out
+```
+
+```sh
+Subscription confirmed!
+You have successfully subscribed.
+
+Your subscription's id is:
+arn:aws:sns:us-east-1:794659242415:billing-alarm:d590bb10-4c6a-49a9-9997-5749be7133bb
+
+If it was not your intention to subscribe, click here to unsubscribe.
+```
+
+#### Create Alarm
+
+- [aws cloudwatch put-metric-alarm](https://docs.aws.amazon.com/cli/latest/reference/cloudwatch/put-metric-alarm.html)
+- [Create an Alarm via AWS CLI](https://aws.amazon.com/premiumsupport/knowledge-center/cloudwatch-estimatedcharges-alarm/)
+- We need to update the configuration json script with :
+	-the TopicARN we generated earlier 
+	and
+	-the daily estimated charges to not exceed (Threshold)
+- We need just a json file because --metrics is required for expressions and so its easier to us a JSON file.
+
+```sh
+aws cloudwatch put-metric-alarm --cli-input-json file://aws/json/alarm_config.json
+```
+### Create an AWS Budget
+
+[aws budgets create-budget](https://docs.aws.amazon.com/cli/latest/reference/budgets/create-budget.html)
+
+Get the AWS Account ID
+```sh
+export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+gp env AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+```
+
+- Supply your AWS Account ID
+- Update the json files
+- This is another case with AWS CLI its just much easier to json files due to lots of nested json
+
+```sh
+aws budgets create-budget \
+    --account-id $AWS_ACCOUNT_ID \
+    --budget file://aws/json/budget.json \
+    --notifications-with-subscribers file://aws/json/budget-notifications-with-subscribers.json
+```
+
 ### Recreate Cruddur Logical Diagram
 
 ![Cruddur Logical Design](assets/CreddurLogicalDiagram.jpeg)
