@@ -225,6 +225,36 @@ CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS 
 ![Backend API TypeError](assets/week1/backend_flask_typeerror.png)
 
 
+### Container Env Vars  
+
+#### Add URLs Env Vars
+- To fix the issue of TypeError, we should add the URLs variables
+
+```sh
+gitpod /workspace/aws-bootcamp-cruddur-2023 (week-1) $ docker run --rm -p 4567:4567 -it backend-flask -e BACKEND_URL=$BACKEND_URL -e FRONTEND_URL=$FRONTEND_URL 
+docker: Error response from daemon: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: exec: "-e": executable file not found in $PATH: unknown.
+```
+-> KO => change position of -e param 
+
+```sh
+$ docker run --rm -e BACKEND_URL=* -e FRONTEND_URL=* -p 4567:4567 -it backend-flask 
+```
+-> OK
+
+```sh
+$ export FRONTEND_URL="*"
+$ export BACKEND_URL="*"
+$ docker run --rm -e BACKEND_URL=$BACKEND_URL -e FRONTEND_URL=$FRONTEND_URL -p 4567:4567 -it backend-flask
+```
+-> OK 
+
+```sh
+gitpod /workspace/aws-bootcamp-cruddur-2023 (week-1) $ docker ps
+CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS          PORTS                                       NAMES
+6a211046b63b   backend-flask   "python3 -m flask ru…"   12 minutes ago   Up 12 minutes   0.0.0.0:4567->4567/tcp, :::4567->4567/tcp   silly_burnell
+gitpod /workspace/aws-bootcamp-cruddur-2023 (week-1) $ 
+```
+
 ### Access Container 
 ```sh
 gitpod /workspace/aws-bootcamp-cruddur-2023 (week-1) $ docker exec -it 6a211046b63b /bin/bash
@@ -232,7 +262,6 @@ root@6a211046b63b:/backend-flask# env | grep _URL
 FRONTEND_URL=*
 BACKEND_URL=*
 PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/d5cb0afaf23b8520f1bbcfed521017b4a95f5c01/public/get-pip.py
-root@6a211046b63b:/backend-flask# ^C
 root@6a211046b63b:/backend-flask# 
 ```
 
@@ -247,42 +276,15 @@ gitpod /workspace/aws-bootcamp-cruddur-2023 (week-1) $ curl -X GET http://localh
     "expires_at": "2023-03-13T21:05:40.883712+00:00",
 ```
 
-### Container Env Vars  
-
-#### Add URLs Env Vars
-- To fix the issue of TypeError, we should add the URLs variables
-
-```sh
-gitpod /workspace/aws-bootcamp-cruddur-2023 (week-1) $ docker run --rm -p 4567:4567 -it backend-flask -e BACKEND_URL=$BACKEND_URL -e FRONTEND_URL=$FRONTEND_URL 
-docker: Error response from daemon: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: exec: "-e": executable file not found in $PATH: unknown.
-```
-> KO => change position of -e param 
-
-```sh
-$ docker run --rm -e BACKEND_URL=* -e FRONTEND_URL=* -p 4567:4567 -it backend-flask 
-```
-> OK
-
-```sh
-$ export FRONTEND_URL="*"
-$ export BACKEND_URL="*"
-$ docker run --rm -e BACKEND_URL=$BACKEND_URL -e FRONTEND_URL=$FRONTEND_URL -p 4567:4567 -it backend-flask
-```
-> OK 
-
-```sh
-gitpod /workspace/aws-bootcamp-cruddur-2023 (week-1) $ docker ps
-CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS          PORTS                                       NAMES
-6a211046b63b   backend-flask   "python3 -m flask ru…"   12 minutes ago   Up 12 minutes   0.0.0.0:4567->4567/tcp, :::4567->4567/tcp   silly_burnell
-gitpod /workspace/aws-bootcamp-cruddur-2023 (week-1) $ 
-```
-
 ### Check Container Logs
 
-Different way to get logs :
->$ docker logs CONTAINER_ID -f
->$ docker logs backend-flask -f
->$ docker logs $CONTAINER_ID -f
+Different way to get logs : 
+
+```sh
+$ docker logs CONTAINER_ID -f
+$ docker logs backend-flask -f
+$ docker logs $CONTAINER_ID -f
+```
 
 ```sh
 gitpod /workspace/aws-bootcamp-cruddur-2023 (week-1) $ docker logs 6a211046b63b -f
